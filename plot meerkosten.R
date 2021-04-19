@@ -60,7 +60,7 @@ plot_meerkosten <- function(buurt_csv) {
   plot <- ggplot(nat_meerkosten, aes(y = Nationale_meerkosten, x = Strategie, fill = Strategie_nr)) +
     geom_bar(stat="identity") +
     geom_text(aes(label=round(Nationale_meerkosten, 2)), vjust=1.6, color="white", size=3.5) +
-    labs(y = "Nationale meerkosten (WEQ)",
+    labs(y = "Nationale meerkosten ([€/weq/jaar])",
          title = paste("Nationale meerkosten per warmtestrategie"),
          subtitle = paste0("gemeente ", gemeentenaam,", ", "buurt ", buurtnaam, " (", buurtcode, ")")) +
     theme_minimal() + 
