@@ -12,16 +12,17 @@ dir.create("plots")
 dir.create("data")
 
 ## Bepaal welke zip-bestanden er zijn. Zoek in de input_data map naar een zipfile. 
-gemeentebestanden <- list.files(path = "input_data",
-                                pattern = "GM[0-9]{4}.zip")
+gemeente_zips <- list.files(path = "input_data",
+                                pattern = "GM[0-9]{4}.zip",
+                                full.names = TRUE)
 
 #### functie om buurtdata in te lezen ####
-plot_meerkosten <- function(buurtpad) {
+plot_meerkosten <- function(buurt_csv) {
   ## Haal de buurtcode uit de bestandsnaam
-  buurtcode <- str_extract(buurtpad, "BU[0-9]*")
+  buurtcode <- str_extract(buurt_csv, "BU[0-9]*")
   
   ## Lees de data in
-  strategie_data <- read_delim(buurtpad, delim = ";", col_types = cols(
+  strategie_data <- read_delim(buurt_csv, delim = ";", col_types = cols(
     .default = col_character()
   ))
   ## Bepaal de naam van de buurt en de gemeente
@@ -90,26 +91,29 @@ plot_meerkosten <- function(buurtpad) {
     
     ## Sla de plot op in de plot-folder
   plot_dir <- paste0("plots/", gemeentenaam)
-  dir.create(plot_dir, recursive = T)
+  if (!dir.exists(plot_dir)) {
+    dir.create(plot_dir, recursive = T)
+  }
+  
   ggsave(paste0("plots/", gemeentenaam, "/Nationale_meerkosten_", buurtcode, ".png"), plot, device = "png", )
 }
 
-plot_gemeente <- function(zippad) {
+plot_gemeente <- function(gemeente_zip) {
   ## Pak de zip uit in de map /data
-  unzip(zippad, exdir = "data")
+  unzip(gemeente_zip, exdir = "data", overwrite = T)
   
   ## bepaal gemeentecode uit de bestandsnaam van het zip-bestand
-  code_gemeente <- str_extract(zippad, pattern = "GM[0-9]*")
+  code_gemeente <- str_extract(gemeente_zip, pattern = "GM[0-9]*")
   
   ## Bepaal datamap waarin de buurtdata staat
   datamap <- paste("data", code_gemeente, paste0(code_gemeente, "_data_buurten_csv"), sep = "/")
   
   ## bepaal de in te lezen buurten door te bekijken welke csv-bestanden beschikbaar zijn
-  buurten_bestanden <- list.files(datamap, pattern = "strategie", full.names = TRUE)
+  buurt_csvs <- list.files(datamap, pattern = "strategie", full.names = TRUE)
   
   ## Voer de plotfunctie uit voor iedere buurt
-  walk(buurten_bestanden, plot_meerkosten)
+  walk(buurt_csvs, plot_meerkosten)
 }
 
 
-walk(gemeentebestanden, plot_gemeente)
+walk(gemeente_zips, plot_gemeente)
