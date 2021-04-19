@@ -11,8 +11,9 @@ library(purrr)
 dir.create("plots")
 dir.create("data")
 
-## Bepaal welke zip-bestanden er zijn. Zoek in de huidige map naar een zipfile. 
-gemeentebestanden <- list.files(pattern = "GM[0-9]{4}.zip")
+## Bepaal welke zip-bestanden er zijn. Zoek in de input_data map naar een zipfile. 
+gemeentebestanden <- list.files(path = "input_data",
+                                pattern = "GM[0-9]{4}.zip")
 
 #### functie om buurtdata in te lezen ####
 plot_meerkosten <- function(buurtpad) {
