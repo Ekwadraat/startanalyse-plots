@@ -49,6 +49,12 @@ plot_meerkosten <- function(buurtpad) {
                                        Strategie_nr == "3" ~ "warmtenet met LT-bron",
                                        Strategie_nr == "4" ~ "groengas",
                                        Strategie_nr == "5" ~ "waterstof")) 
+  
+  
+  
+  ## Bepaal de y-limiet
+  y_limiet <- 3000
+  
   ## Maak de plot
   plot <- ggplot(nat_meerkosten, aes(y = Nationale_meerkosten, x = Strategie, fill = Strategie_nr)) +
     geom_bar(stat="identity") +
@@ -64,7 +70,24 @@ plot_meerkosten <- function(buurtpad) {
                                  "2" = "#c1241f",
                                  "3" = "#1d9cdc",
                                  "4" = "#288042",
-                                 "5" = "#E6AD1F"))
+                                 "5" = "#E6AD1F")) +
+    coord_cartesian(ylim = c(0,y_limiet)) 
+  
+  ## Deze if-statement checkt of de plot relevante data heeft. Dit gaat fout als
+  ## er geen strategieen zijn doorgerekend.
+  ## deze check zit hier omdat jet volgende if-statement anders een fout geeft.
+  if (!all(is.na(nat_meerkosten$Strategie))) {
+    ## Als er waarden zijn die hoger zijn dan de y-limiet (meestal MT/HT-warmtebronnen), moet dit geannoteerd worden
+    if (any(nat_meerkosten$Nationale_meerkosten > y_limiet)) {
+      te_hoog_nr <- which(nat_meerkosten$Nationale_meerkosten > y_limiet)
+      plot <- plot +
+        annotate("text", x = te_hoog_nr, y = y_limiet, label = "Waarde buiten\nbereik", col = "grey80")
+    }
+  }
+  
+  
+  
+    
     ## Sla de plot op in de plot-folder
   plot_dir <- paste0("plots/", gemeentenaam)
   dir.create(plot_dir, recursive = T)
