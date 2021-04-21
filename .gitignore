@@ -39,3 +39,4 @@ rsconnect/
 /data/
 /plots/
 *.zip
+/output/
